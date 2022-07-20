@@ -120,7 +120,7 @@
     "lint-staged": "^12.3.5",
     "nodemon": "^2.0.12",
     "nyc": "^15.1.0",
-    "relay-compiler": "^13.2.0",
+    "relay-compiler": "^14.0.0",
     "start-server-and-test": "^1.13.1",
     "webpack": "^4.44.0",
     "webpack-cli": "^4.9.2"
