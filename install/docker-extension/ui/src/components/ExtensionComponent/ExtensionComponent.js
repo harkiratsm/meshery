@@ -110,17 +110,54 @@ const ExtensionsComponent = () => {
   const [token, setToken] = useState();
   const [changing, isChanging] = useState(false);
   const [emptystate,isEmptystate]=useState(true)
-  const [meshAdapters, setMeshAdapters] = useState(null);
-  useEffect(() => {
-    if (meshAdapters && meshAdapters.length != 0) {
-      setSwitchesState(
-        meshAdapters.map((adapter) => ({
-          [adapter.name]: false,
-        }))
+  const meshAdapters=[];
+  useEffect(()=>{
+    const load= async ()=>{
+      const containers = await window.ddClient.listContainers();
+      const temp=["APP_MESH","CILIUM_SERVICE_MESH","CONSUL","ISTIO","KUMA","LINKERD","NGINX_SERVICE_MESH","OSM","TRAEFIK_MESH"];
+      containers.filter((container)=>{
+        if (container.State==='running'&&container.Image.includes('meshery')) {
+            const name=container.Image.split('/')[1].split(":")[0].split('-')[1];
+            const adapterName=name?.length>0?name.toUpperCase():null;            
+            const index=temp.findIndex(ele=>{
+              if(ele.includes(adapterName)){
+                return true
+              }
+            })
+            if(index===-1){
+              return false
+            }
+            meshAdapters.push({"name":temp[index]})
+            
+        }
+
         
-      );
+      });
+      console.log("hehehe")
+      isEmptystate(false);
+      
     }
-  }, [meshAdapters]);
+    
+    load().catch((err)=>console.log(err))
+    
+    console.log(meshAdapters)
+    
+  },[])
+  useEffect(() => {
+    setTimeout(() => {
+      if (meshAdapters && meshAdapters.length != 0) {
+        setSwitchesState(
+          meshAdapters.map((adapter) => ({
+            [adapter.name]: false,
+          }))
+          
+        );
+      }
+    }, 100);
+    console.log(switchesState)
+  }, [isEmptystate]);
+  
+  
   const [mesheryVersion, setMesheryVersion] = useState(null);
 
   const logout = () => {
@@ -152,13 +189,6 @@ const ExtensionsComponent = () => {
             .then((res) => res.text())
             .then((res) => setUserName(JSON.parse(res)?.user_id))
             .catch(console.error);
-          fetch(proxyUrl + "/api/system/sync")
-            .then((res) => res.json())
-            .then((data) => {
-              setMeshAdapters(data.meshAdapters)
-              isEmptystate(false)
-            })
-            .catch(console.err);
           fetch(proxyUrl + "/api/system/version")
             .then((result) => result.text())
             .then((result) => setMesheryVersion(JSON.parse(result)?.build))
@@ -369,7 +399,7 @@ const ExtensionsComponent = () => {
                     <div>
                     <Typography sx={{ marginBottom: "1rem" }}>Deploy a Service Mesh</Typography>
                     <ServiceMeshAdapters>
-                      {meshAdapters && switchesState && meshAdapters.map(adapter =>
+                      {/* {meshAdapters && switchesState && meshAdapters.map(adapter =>
                         <StyledDiv>
                           <AdapterDiv inactiveAdapter={switchesState ? !switchesState[adapter.name] : true}>{adapters[adapter.name].icon}</AdapterDiv>
                           <Typography sx={{ whiteSpace: "nowrap" }}>{adapters[adapter.name].displayName}</Typography>
@@ -379,6 +409,11 @@ const ExtensionsComponent = () => {
                           }
                           } color="primary"></Switch>
                         </StyledDiv>
+                      )} */}
+                      {meshAdapters && switchesState && meshAdapters.map(adapter=>
+                          <div>
+                            {adapter.name}
+                          </div>
                       )}
                     </ServiceMeshAdapters>
                     </div>
