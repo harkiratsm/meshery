@@ -12,7 +12,7 @@
   "type": "object",
   "properties": {
     "apiVersion": {
-      "type": "string",
+      "$ref": "https://schema.meshery.io/core.json#apiVersionString",
       "description": "API Version of the component."
     },
     "kind": {

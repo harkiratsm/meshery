@@ -10,6 +10,10 @@
     "versionString":{
       "type": "string",
       "pattern": "^\\d+(\\.\\d+){0,2}(-(alpha|beta))?$"
+    },
+    "apiVersionString":{
+      "type": "string",
+      "pattern": "^(?:[\\w\\.-]+\\/)?v\\d\\/(alpha|beta)\\d$"    
     }
   }
 }
